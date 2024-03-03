@@ -8,11 +8,12 @@
 from enum import Enum
 
 
-class Type(Enum):
+class CardType(Enum):
     """
     Enumeration for representing types of cards.
 
     """
+    LOW_ACE = 1
     TWO = 2
     THREE = 3
     FOUR = 4
@@ -27,11 +28,3 @@ class Type(Enum):
     KING = 13
     ACE = 14
     HIDDEN = 16
-
-    def __repr__(self):
-        """
-        Returns a Capitalized string representation of the card type (ex: Jack).
-
-        :return: String representation of card type.
-        """
-        return repr(self).lower()

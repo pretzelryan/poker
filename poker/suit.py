@@ -13,8 +13,8 @@ class Suit(Enum):
     Enumeration for representing suits of cards.
 
     """
-    SPADES = 1
-    HEARTS = 2
-    CLUBS = 3
-    DIAMONDS = 4
-    HIDDEN = 5
+    SPADES = 0
+    HEARTS = 1
+    CLUBS = 2
+    DIAMONDS = 3
+    HIDDEN = 4

@@ -6,8 +6,8 @@
 #
 
 # Import suit and type enumerations.
-from suit import *
-from type import *
+from .suit import *
+from .type import *
 
 
 class Card:
@@ -16,13 +16,16 @@ class Card:
 
     """
 
-    def __init__(self, suit, name):
+    def __init__(self, suit, card_type):
         """
-        Constructor.
+        Constructor. See
 
+        :param suit: Integer to specify card suit.
+        :param card_type: Integer to specify card type.
         """
         self.hidden = True
-        # TODO: initialize card attributes
+        self.suit = Suit(suit)
+        self.type = CardType(card_type)
 
     def reveal_card(self):
         """
@@ -41,10 +44,9 @@ class Card:
         """
         if self.hidden:
             return "Hidden Card"
-        # TODO: return the actual card
-        return "Jack of Hearts"
+        return str(self.type.name).capitalize() + " of " + str(self.suit.name).capitalize()
 
-    def getSuit(self):
+    def get_suit(self):
         """
         Gets the enumeration representation of the card's suit.  If the card is hidden, returns HIDDEN enum,
         otherwise returns the card suit (ex: Suit.HEART).
@@ -53,11 +55,9 @@ class Card:
         """
         if self.hidden:
             return Suit.HIDDEN
+        return self.suit
 
-        # TODO: return actual suit
-        return Suit.HIDDEN
-
-    def getType(self):
+    def get_type(self):
         """
         Gets the enumeration representation of the card's type.  If the card is hidden, returns the HIDDEN enum,
         otherwise returns the card type (ex: Type.KING).
@@ -65,8 +65,6 @@ class Card:
         :return:
         """
         if self.hidden:
-            return Type.HIDDEN
-
-        # TODO: return actual type
-        return Type.HIDDEN
+            return CardType.HIDDEN
+        return self.type
 
