@@ -39,14 +39,6 @@ class Player:
         """
         return self.active
 
-    def fold(self):
-        """
-        Player forfeits their hand. Once a player folds, they can no longer win the pot in that hand.
-
-        :return: None
-        """
-        self.active = False
-
     def add_card(self, card: Card):
         """
         Adds a card to the player's hand during the dealing process.
@@ -54,13 +46,23 @@ class Player:
         :param card: Card to be added to the player's hand
         :return: None
         """
-        if len(self.pocket) > 2:
+        if len(self.pocket) < 2:
             self.pocket.append(card)
             self.pocket[-1].reveal_card()
+
+    def fold(self):
+        """
+        Player forfeits their hand. Once a player folds, they can no longer win the pot in that hand.
+
+        :return: None
+        """
+        self.active = False
+        return None
 
     def bet(self, amount: float):
         """
         Player puts in the first bet of the current betting round. Cannot bet if a bet has already been placed.
+        If the total bet exceeds the player's current balance, the player will automatically all-in.
 
         :param amount: Float amount of chips the player is betting.
         :return: Float amount bet.
@@ -72,12 +74,24 @@ class Player:
             return self.all_in()
 
     def call_raise(self, current_bet: float, amount: float):
-        pass
+        """
+        Player matches the current bet placed, and then raises the bet for the current betting round.
+        If the total bet exceeds the player's current balance, the player will automatically all-in.
+
+        :param current_bet:
+        :param amount:
+        :return:
+        """
+        call_amount = self.call(current_bet)
+        if call_amount < current_bet:
+            return call_amount
+        return self.bet(amount) + call_amount
 
     def call(self, current_bet: float):
         """
         Player matches the current bet placed for the current betting round.
-        Cannot check if a bet has not been placed.
+        Cannot check if a bet has not been placed.  If the current bet exceeds the player's current balance,
+        the player will automatically all in.
 
         :param current_bet: Float amount of chips that other players have bet.
         :return: Float amount of chips the player is matching with.
@@ -90,13 +104,14 @@ class Player:
 
     def check(self, current_bet: float):
         """
-        Player does nothing during their turn. Cannot check if a bet has been placed.
+        Player does nothing during their turn. Cannot check if a bet has been placed.  If a player attempts to
+        check while a bet has been placed, they will automatically fold.
 
-        :return: None
+        :return: Integer zero if no bet has been placed, otherwise returns False.
         """
         if current_bet > 0:
-            self.fold()
-        pass
+            return self.fold()
+        return 0
 
     def all_in(self):
         """
