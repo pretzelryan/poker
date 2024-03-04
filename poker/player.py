@@ -68,6 +68,14 @@ class Player:
             self.pocket.append(card)
             self.pocket[-1].reveal_card()
 
+    def clear_pocket(self):
+        """
+        Clears the cards from the player's pocket.
+
+        :return: None
+        """
+        self.pocket = []
+
     def fold(self):
         """
         Player forfeits their hand. Once a player folds, they can no longer win the pot in that hand.
