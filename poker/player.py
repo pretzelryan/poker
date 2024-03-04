@@ -37,6 +37,15 @@ class Player:
     def __repr__(self):
         return self.name
 
+    def is_player_active(self):
+        """
+        Returns true if the player is still active in the current hand. Otherwise false.
+        Players become inactive when they fold.
+
+        :return: Boolean true if player is active, false otherwise.
+        """
+        return self.active
+
     def fold(self):
         """
         Player forfeits their hand. Once a player folds, they can no longer win the pot in that hand.

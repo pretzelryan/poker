@@ -1,7 +1,7 @@
 ###############################################################################
 #
 # Testing file to verify card class is working as intended
-# Also tests the type and suit enumerations.
+# Also tests the cardType and suit enumerations.
 #
 # Author - Ryan Muetzel (@pretzelryan)
 #
