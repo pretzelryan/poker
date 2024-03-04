@@ -14,25 +14,18 @@ class Player:
 
     """
 
-    def __init__(self, name: str, card1: Card, card2: Card, chip_count: float):
+    def __init__(self, name: str, chip_count: float):
         """
         Constructor.
 
         :param name: String for the player's name.
-        :param card1: Card object for the player's first pocket card.
-        :param card2: Card object for the player's second pocket card.
         :param chip_count: Float for the amount of money the player started with.
         """
 
         self.name = name
-        self.card1 = card1
-        self.card2 = card2
         self.chip_count = chip_count
+        self.pocket = []
         self.active = True
-
-        # Make sure the player can see their own cards.
-        self.card1.reveal_card()
-        self.card2.reveal_card()
 
     def __repr__(self):
         return self.name
@@ -54,13 +47,34 @@ class Player:
         """
         self.active = False
 
-    def bet(self):
-        pass
+    def add_card(self, card: Card):
+        """
+        Adds a card to the player's hand during the dealing process.
 
-    def call_raise(self):
+        :param card: Card to be added to the player's hand
+        :return: None
+        """
+        if len(self.pocket) > 2:
+            self.pocket.append(card)
+            self.pocket[-1].reveal_card()
+
+    def bet(self, amount):
+        """
+        Player puts in the first bet of the current betting round.
+
+        :param amount: Double amount of chips bet.
+        :return: Double amount bet.
+        """
+        self.chip_count -= amount
+        return amount
+
+    def call_raise(self, amount):
         pass
 
     def call(self):
+        pass
+
+    def check(self):
         pass
 
     def all_in(self):
