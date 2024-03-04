@@ -62,7 +62,7 @@ class Player:
         """
         Player puts in the first bet of the current betting round. Cannot bet if a bet has already been placed.
 
-        :param amount: Float amount of chips bet.
+        :param amount: Float amount of chips the player is betting.
         :return: Float amount bet.
         """
         if amount < self.chip_count:
@@ -79,17 +79,23 @@ class Player:
         Player matches the current bet placed for the current betting round.
         Cannot check if a bet has not been placed.
 
-        :param current_bet:
-        :return:
+        :param current_bet: Float amount of chips that other players have bet.
+        :return: Float amount of chips the player is matching with.
         """
-        pass
+        if current_bet < self.chip_count:
+            self.chip_count -= current_bet
+            return current_bet
+        else:
+            return self.all_in()
 
-    def check(self):
+    def check(self, current_bet: float):
         """
         Player does nothing during their turn. Cannot check if a bet has been placed.
 
         :return: None
         """
+        if current_bet > 0:
+            self.fold()
         pass
 
     def all_in(self):
