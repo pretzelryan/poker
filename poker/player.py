@@ -32,6 +32,22 @@ class Player:
     def __repr__(self):
         return self.name
 
+    def get_pocket(self):
+        """
+        Accessor for the player's pocket cards. These cards are not hidden.
+
+        :return: List of player's card objects.
+        """
+        return self.pocket
+
+    def get_chip_count(self):
+        """
+        Accessor for the player's chip count.
+
+        :return: Float of player's chips.
+        """
+        return self.chip_count
+
     def is_player_active(self):
         """
         Returns true if the player is still active in the current hand. Otherwise false.
