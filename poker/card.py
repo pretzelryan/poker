@@ -5,9 +5,42 @@
 # Author - Ryan Muetzel (@pretzelryan)
 #
 
-# Import suit and type enumerations.
-from .suit import *
-from .type import *
+# Import statements.
+from enum import Enum
+
+
+class CardType(Enum):
+    """
+    Enumeration for representing types of cards.
+
+    """
+    LOW_ACE = 1
+    TWO = 2
+    THREE = 3
+    FOUR = 4
+    FIVE = 5
+    SIX = 6
+    SEVEN = 7
+    EIGHT = 8
+    NINE = 9
+    TEN = 10
+    JACK = 11
+    QUEEN = 12
+    KING = 13
+    ACE = 14
+    HIDDEN = 16
+
+
+class Suit(Enum):
+    """
+    Enumeration for representing suits of cards.
+
+    """
+    SPADES = 0
+    HEARTS = 1
+    CLUBS = 2
+    DIAMONDS = 3
+    HIDDEN = 4
 
 
 class Card:
@@ -16,9 +49,9 @@ class Card:
 
     """
 
-    def __init__(self, suit, card_type):
+    def __init__(self, suit: int, card_type: int):
         """
-        Constructor. See
+        Constructor.
 
         :param suit: Integer to specify card suit.
         :param card_type: Integer to specify card type.

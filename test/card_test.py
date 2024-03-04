@@ -7,7 +7,6 @@
 #
 
 from poker import card
-from poker import type
 
 
 def main():
@@ -21,7 +20,7 @@ def main():
     print("Get card type. Expected: CardType.TWO     Actual:", new_card.get_type())
     print("Get card suit. Expected: Suit.HEARTS     Actual:", new_card.get_suit())
 
-    new_type = type.CardType(16)
+    new_type = card.CardType(16)
     print("\nCard Type. Expected: Type.HIDDEN     Actual:", new_type)
 
 
