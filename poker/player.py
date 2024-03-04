@@ -58,24 +58,46 @@ class Player:
             self.pocket.append(card)
             self.pocket[-1].reveal_card()
 
-    def bet(self, amount):
+    def bet(self, amount: float):
         """
-        Player puts in the first bet of the current betting round.
+        Player puts in the first bet of the current betting round. Cannot bet if a bet has already been placed.
 
-        :param amount: Double amount of chips bet.
-        :return: Double amount bet.
+        :param amount: Float amount of chips bet.
+        :return: Float amount bet.
         """
-        self.chip_count -= amount
-        return amount
+        if amount < self.chip_count:
+            self.chip_count -= amount
+            return amount
+        else:
+            return self.all_in()
 
-    def call_raise(self, amount):
+    def call_raise(self, current_bet: float, amount: float):
         pass
 
-    def call(self):
+    def call(self, current_bet: float):
+        """
+        Player matches the current bet placed for the current betting round.
+        Cannot check if a bet has not been placed.
+
+        :param current_bet:
+        :return:
+        """
         pass
 
     def check(self):
+        """
+        Player does nothing during their turn. Cannot check if a bet has been placed.
+
+        :return: None
+        """
         pass
 
     def all_in(self):
-        pass
+        """
+        Player puts all of their remaining chips in as a bet.
+
+        :return: Float amount bet.
+        """
+        chips_bet = self.chip_count
+        self.chip_count = 0
+        return chips_bet
