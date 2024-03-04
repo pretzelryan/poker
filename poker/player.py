@@ -11,6 +11,7 @@ from .card import *
 class Player:
     """
     A class to represent users in the game, and allow them to interact with the game.
+    Betting methods are designed to return a float if the user is remaining active, or None if the player folds.
 
     """
 
@@ -77,9 +78,10 @@ class Player:
         """
         Player matches the current bet placed, and then raises the bet for the current betting round.
         If the total bet exceeds the player's current balance, the player will automatically all-in.
+        This function should only be called if a bet has already been placed.
 
-        :param current_bet:
-        :param amount:
+        :param current_bet: Float amount of chips that other players have bet.
+        :param amount: Float total amount of chips this player is putting in the pot this betting round.
         :return:
         """
         call_amount = self.call(current_bet)
@@ -94,7 +96,7 @@ class Player:
         the player will automatically all in.
 
         :param current_bet: Float amount of chips that other players have bet.
-        :return: Float amount of chips the player is matching with.
+        :return: Float amount of chips this player is matching with.
         """
         if current_bet < self.chip_count:
             self.chip_count -= current_bet
@@ -111,7 +113,7 @@ class Player:
         """
         if current_bet > 0:
             return self.fold()
-        return 0
+        return float(0)
 
     def all_in(self):
         """
