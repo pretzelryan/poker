@@ -94,12 +94,14 @@ class Hand:
         """
         Removes all hidden cards from the card list.
 
-        :return: None
+        :return: None.
         """
-        pass
+        self.card_list = [card for card in self.card_list if not card.is_hidden()]
 
     def _sort_cards(self):
         """
         Sorts the card list from highest value to lowest value.
-        :return:
+
+        :return: None.
         """
+        pass
