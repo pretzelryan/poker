@@ -62,7 +62,10 @@ class Hand:
 
         :return: None.
         """
-        pass
+
+        # Prepare the card list by removing hidden cards and sorting high to low.
+        self._filter_hidden_cards()
+        self._sort_cards()
 
     def append_card_list(self, card_list: list[Card]):
         """
@@ -104,4 +107,4 @@ class Hand:
 
         :return: None.
         """
-        pass
+        self.card_list.sort(key=lambda x: x.get_type().value, reverse=True)
