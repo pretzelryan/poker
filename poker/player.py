@@ -9,6 +9,9 @@
 from .card import *
 
 
+CARDS_IN_POCKET = 2
+
+
 class Player:
     """
     A class to represent users in the game, and allow them to interact with the game.
@@ -64,7 +67,7 @@ class Player:
         :param card: Card to be added to the player's hand
         :return: None
         """
-        if len(self.pocket) < 2:
+        if len(self.pocket) < CARDS_IN_POCKET:
             self.pocket.append(card)
             self.pocket[-1].reveal_card()
 

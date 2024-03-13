@@ -26,7 +26,7 @@ def generate_deck():
     :return: List of 52 card objects.
     """
     deck = []
-    for suit in range(4):
+    for suit in range(1, 5):
         deck += [Card(suit, card_type) for card_type in range(2, 15)]
     return deck
 

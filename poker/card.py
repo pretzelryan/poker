@@ -14,6 +14,7 @@ class CardType(Enum):
     Enumeration for representing types of cards.
 
     """
+    HIDDEN = 0
     LOW_ACE = 1
     TWO = 2
     THREE = 3
@@ -28,7 +29,6 @@ class CardType(Enum):
     QUEEN = 12
     KING = 13
     ACE = 14
-    HIDDEN = 16
 
 
 class Suit(Enum):
@@ -36,11 +36,11 @@ class Suit(Enum):
     Enumeration for representing suits of cards.
 
     """
-    SPADES = 0
-    HEARTS = 1
-    CLUBS = 2
-    DIAMONDS = 3
-    HIDDEN = 4
+    HIDDEN = 0
+    SPADES = 1
+    HEARTS = 2
+    CLUBS = 3
+    DIAMONDS = 4
 
 
 class Card:
