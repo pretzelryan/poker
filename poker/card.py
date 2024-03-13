@@ -60,14 +60,6 @@ class Card:
         self.suit = Suit(suit)
         self.type = CardType(card_type)
 
-    def reveal_card(self):
-        """
-        Allows other classes to see the value of the card (if not already visible)
-
-        :return: None
-        """
-        self.hidden = False
-
     def __repr__(self):
         """
         Gets the string representation of the card.  If the card is hidden, returns 'Hidden Card',
@@ -78,6 +70,14 @@ class Card:
         if self.hidden:
             return "Hidden Card"
         return str(self.type.name).capitalize() + " of " + str(self.suit.name).capitalize()
+
+    def is_hidden(self):
+        """
+        Gets the value of the card's boolean hidden attribute.
+
+        :return: Boolean value of hidden.
+        """
+        return self.hidden
 
     def get_suit(self):
         """
@@ -101,3 +101,10 @@ class Card:
             return CardType.HIDDEN
         return self.type
 
+    def reveal_card(self):
+        """
+        Allows other classes to see the value of the card (if not already visible)
+
+        :return: None
+        """
+        self.hidden = False
