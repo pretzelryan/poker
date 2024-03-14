@@ -71,6 +71,16 @@ class Card:
             return "Hidden Card"
         return str(self.type.name).capitalize() + " of " + str(self.suit.name).capitalize()
 
+    def __eq__(self, other):
+        """
+        Compares if two cards are equal to each other.  If the suit and the card type match, then the two cards are
+        equal.  Hidden cards cannot be compared, and will always return False.
+
+        :param other: Card object to be compared.
+        :return: Boolean True if the cards are equal, False otherwise.
+        """
+        return (not self.hidden) and (self.get_suit() == other.get_suit()) and (self.get_suit() == other.get_suit())
+
     def is_hidden(self):
         """
         Gets the value of the card's boolean hidden attribute.
