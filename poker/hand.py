@@ -5,7 +5,16 @@
 # Author - Ryan Muetzel (@pretzelryan)
 #
 
+# Standard packages
+from collections import Counter
+
+
+# Package imports.
 from .card import *
+
+
+CARDS_IN_STRAIGHT = 5
+CARDS_IN_FLUSH = 5
 
 
 class HandType(Enum):
@@ -26,9 +35,99 @@ class HandType(Enum):
     ROYAL_FLUSH = 10
 
 
+def _find_multiples(card_list: list[Card], count: int):
+    """
+    Search algorithm to determine if there are count multiples of cards in the card list. If there are enough
+    of the same card, the CardType of that set is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :param count: Number of multiples to be found.
+    :return: CardType enum of the highest value multiple found.  If no multiple are found, returns CardType.HIDDEN.
+    """
+
+    # Cards should have been filtered and sorted from high to low before this function call.
+    card_type_list = [card.get_type() for card in card_list]
+    count_dict = Counter(card_type_list)
+
+    # Check each element in the generated
+    for card_type in count_dict:
+        if count_dict[card_type] >= count:
+            return card_type
+
+    return CardType.HIDDEN
+
+
+def _find_flush(card_list: list[Card]):
+    """
+    Search algorithm to determine if there are at least 5 cards of the same suit. If there are enough suited cards,
+    the CardType of the highest card of that suit is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: CardType enum of the highest card of that suit.  If no flush is found, returns CardType.HIDDEN.
+    """
+
+    # Cards should have been filtered and sorted from high to low before this function call.
+    suit_list = [card.get_suit() for card in card_list]
+    count_dict = Counter(suit_list)
+
+    # See if a suit has 5 or more cards
+    flush_suit = Suit.HIDDEN
+    for suit in count_dict:
+        if count_dict[suit] >= CARDS_IN_FLUSH:
+            flush_suit = suit
+            break
+
+    # If there is a flush get the highest value card of that suit
+    if flush_suit is not Suit.HIDDEN:
+        for card in card_list:
+            if card.get_suit() == flush_suit:
+                return card.get_type()
+
+    return CardType.HIDDEN
+
+
+def _find_straight(card_list: list[Card]):
+    """
+    Search algorithm to determine if there are at least 5 cards in a row.  If a straight is detected, the CardType of
+    the highest value card in the straight is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: CardType enum of the highest card in straight. If no straight is found, returns CardType.HIDDEN.
+    """
+
+    # Cards should have been filtered and sorted from high to low before this function call.
+    # Generate a list such that there are no duplicate card types.
+    card_type_list = []
+    [card_type_list.append(card.get_type()) for card in card_list if card.get_type() not in card_type_list]
+
+    # Add an ace at the end to check for a low straight.
+    if card_type_list[0] == CardType.ACE:
+        card_type_list.append(CardType.LOW_ACE)
+
+    # If there are sufficient cards, iterate through the list and look for a 5 in a row.
+    # Keep track of the first card in the row, and count if there are 4 more consecutive cards.
+    if len(card_type_list) >= CARDS_IN_STRAIGHT:
+        consecutive_cards = 1
+        start_card = card_type_list[0]
+        for i in range(len(card_type_list) - 1):
+            consecutive_cards += 1
+
+            # If the consecutive streak is broken then reset the starting card and the consecutive counter.
+            if card_type_list[i].value != (card_type_list[i + 1].value + 1):
+                consecutive_cards = 1
+                start_card = card_type_list[i + 1]
+
+            # If there are sufficient cards in a row then return the highest (first) card in the straight.
+            if consecutive_cards >= CARDS_IN_STRAIGHT:
+                return start_card
+
+    # If a straight is not found.
+    return CardType.HIDDEN
+
+
 class Hand:
     """
-    TODO: Docs
+    Class to determine the strength of a player's hand.
 
     """
     def __init__(self):
