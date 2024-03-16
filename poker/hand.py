@@ -57,6 +57,27 @@ def _find_multiples(card_list: list[Card], count: int):
     return CardType.HIDDEN
 
 
+def _find_flush_suit(card_list: list[Card]):
+    """
+    Search algorithm to determine if there are at least 5 cards of the same suit. If there are enough suited cards,
+    the Suit enumeration of that suit is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: Suit enum of the flush found. If no flush is found, returns Suit.HIDDEN.
+    """
+
+    # Cards should have been filtered and sorted from high to low before this function call.
+    suit_list = [card.get_suit() for card in card_list]
+    count_dict = Counter(suit_list)
+
+    # See if a suit has 5 or more cards
+    for suit in count_dict:
+        if count_dict[suit] >= CARDS_IN_FLUSH:
+            return suit
+
+    return Suit.Hidden
+
+
 def _find_flush(card_list: list[Card]):
     """
     Search algorithm to determine if there are at least 5 cards of the same suit. If there are enough suited cards,
@@ -66,16 +87,7 @@ def _find_flush(card_list: list[Card]):
     :return: CardType enum of the highest card of that suit.  If no flush is found, returns CardType.HIDDEN.
     """
 
-    # Cards should have been filtered and sorted from high to low before this function call.
-    suit_list = [card.get_suit() for card in card_list]
-    count_dict = Counter(suit_list)
-
-    # See if a suit has 5 or more cards
-    flush_suit = Suit.HIDDEN
-    for suit in count_dict:
-        if count_dict[suit] >= CARDS_IN_FLUSH:
-            flush_suit = suit
-            break
+    flush_suit = _find_flush_suit(card_list)
 
     # If there is a flush get the highest value card of that suit
     if flush_suit is not Suit.HIDDEN:
@@ -139,7 +151,8 @@ def _find_straight_flush(card_list: list[Card]):
     flush_suit = _find_flush(card_list)
 
     # If there is a flush, create a new list that only contains cards of that suit and check for a straight.
-    if flush_suit is not CardType.HIDDEN:
+    if flush_suit is not Suit.HIDDEN:
+        # need to find the flush suit, rather than the highest card in the flush
         filtered_list = [card for card in card_list if card.get_suit() is flush_suit]
         return _find_straight(filtered_list)
 
