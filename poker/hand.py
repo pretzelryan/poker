@@ -159,11 +159,31 @@ def _find_full_house(card_list: list[Card]):
 
     trips = _find_multiples(card_list, 3)
 
-    # if there is a set of trips and another pair, return the trips CardType enum.
+    # If there is a set of trips and another pair, return the trips CardType enum.
     if trips is not CardType.HIDDEN:
         filtered_list = [card for card in card_list if card.get_type() is not trips]
         if _find_multiples(filtered_list, 2) is not CardType.HIDDEN:
             return trips
+
+    return CardType.HIDDEN
+
+
+def _find_two_pair(card_list: list[Card]):
+    """
+    Search algorithm to determine if there are two different pairs in the provided list of cards. If a two pair is
+    detected, the CardType enum of the largest pair is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: CardType enum of the largest pair in the two pair. If no two pair is found, returns CardType.HIDDEN.
+    """
+
+    large_pair = _find_multiples(card_list, 2)
+
+    # If there is a pair and another pair, return the highest pair CardType enum.
+    if large_pair is not CardType.HIDDEN:
+        filtered_list = [card for card in card_list if card.get_type() is not large_pair]
+        if _find_multiples(filtered_list, 2) is not CardType.HIDDEN:
+            return large_pair
 
     return CardType.HIDDEN
 
@@ -180,6 +200,7 @@ class Hand:
         """
         self.hand_type = HandType(0)
         self.card_list = []
+        self.best_hand = []
 
     def __repr__(self):
         """
@@ -195,7 +216,7 @@ class Hand:
 
         :return: HandType enumeration.
         """
-        # should evaluate_hand be called here?
+        # should evaluate_hand be called here? Maybe if the current HandType is NOT_EVALUATED?
         return self.hand_type
 
     def evaluate_hand(self):
@@ -208,6 +229,72 @@ class Hand:
         # Prepare the card list by removing hidden cards and sorting high to low.
         self._filter_hidden_cards()
         self._sort_cards()
+
+        # Check for strongest hands first so that the program can end early once the strongest hand is found.
+
+        # Could you instead loop through a dict instead of the elif statements?
+        # self.hand_type = HandType.HIGH_CARD
+        # hand_dict = {HandType.QUADS: _find_multiples(self.card_list, 4),
+        #             HandType.FULL_HOUSE: _find_full_house(self.card_list),
+        #             HandType.FLUSH: _find_flush(self.card_list),
+        #             HandType.STRAIGHT: _find_straight(self.card_list),
+        #             HandType.TRIPS: _find_multiples(self.card_list, 3),
+        #             HandType.TWO_PAIR: _find_two_pair(self.card_list),
+        #             HandType.PAIR: _find_multiples(self.card_list, 2)}
+        #
+        # After Royal/Straight Flush determination
+        # else:
+        #     for hand in hand_dict:
+        #         if hand_dict[hand] is not CardType.HIDDEN:
+        #             self.hand_type = hand
+        #             break
+
+        # Royal/Straight flush.
+        straight_flush_card_type = _find_straight_flush(self.card_list)
+        if straight_flush_card_type is not CardType.HIDDEN:
+            if straight_flush_card_type is CardType.ACE:
+                self.hand_type = HandType.ROYAL_FLUSH
+            else:
+                self.hand_type = HandType.STRAIGHT_FLUSH
+
+        # Quads.
+        elif _find_multiples(self.card_list, 4) is not CardType.HIDDEN:
+            self.hand_type = HandType.QUADS
+
+        # Full house.
+        elif _find_full_house(self.card_list) is not CardType.HIDDEN:
+            self.hand_type = HandType.FULL_HOUSE
+
+        # Flush.
+        elif _find_flush(self.card_list) is not CardType.HIDDEN:
+            self.hand_type = HandType.FLUSH
+
+        # Straight.
+        elif _find_straight(self.card_list) is not CardType.HIDDEN:
+            self.hand_type = HandType.STRAIGHT
+
+        # Trips.
+        elif _find_multiples(self.card_list, 3) is not CardType.HIDDEN:
+            self.hand_type = HandType.TRIPS
+
+        # Two Pair
+        elif _find_two_pair(self.card_list) is not CardType.HIDDEN:
+            self.hand_type = HandType.TWO_PAIR
+
+        # Pair
+        elif _find_multiples(self.card_list, 2) is not CardType.HIDDEN:
+            self.hand_type = HandType.PAIR
+
+        # Hand must be High card.
+        else:
+            self.hand_type = HandType.HIGH_CARD
+
+    def update_hand_list(self):
+        """
+        Update best_hand to create a list of up to 5 cards that create the best hand.
+
+        :return: None.
+        """
 
     def append_card_list(self, card_list: list[Card]):
         """
