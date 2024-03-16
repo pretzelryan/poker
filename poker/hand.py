@@ -75,7 +75,7 @@ def _find_flush_suit(card_list: list[Card]):
         if count_dict[suit] >= CARDS_IN_FLUSH:
             return suit
 
-    return Suit.Hidden
+    return Suit.HIDDEN
 
 
 def _find_flush(card_list: list[Card]):
@@ -148,7 +148,7 @@ def _find_straight_flush(card_list: list[Card]):
     returns CardType.HIDDEN.
     """
 
-    flush_suit = _find_flush(card_list)
+    flush_suit = _find_flush_suit(card_list)
 
     # If there is a flush, create a new list that only contains cards of that suit and check for a straight.
     if flush_suit is not Suit.HIDDEN:
