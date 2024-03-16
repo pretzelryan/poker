@@ -80,7 +80,7 @@ def _find_flush(card_list: list[Card]):
     # If there is a flush get the highest value card of that suit
     if flush_suit is not Suit.HIDDEN:
         for card in card_list:
-            if card.get_suit() == flush_suit:
+            if card.get_suit() is flush_suit:
                 return card.get_type()
 
     return CardType.HIDDEN
@@ -88,7 +88,7 @@ def _find_flush(card_list: list[Card]):
 
 def _find_straight(card_list: list[Card]):
     """
-    Search algorithm to determine if there are at least 5 cards in a row.  If a straight is detected, the CardType of
+    Search algorithm to determine if there are at least 5 cards in a row. If a straight is detected, the CardType of
     the highest value card in the straight is returned.
 
     :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
@@ -122,6 +122,49 @@ def _find_straight(card_list: list[Card]):
                 return start_card
 
     # If a straight is not found.
+    return CardType.HIDDEN
+
+
+def _find_straight_flush(card_list: list[Card]):
+    """
+    Search algorithm to determine if there is a straight flush in the provided list of cards.
+    A straight flush is defined as 5 cards in a row that are all the same suit. If a straight flush is detected,
+    then the CardType enum of the highest card in the set is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: CardType enum of the highest card in the straight flush. If no straight flush is found,
+    returns CardType.HIDDEN.
+    """
+
+    flush_suit = _find_flush(card_list)
+
+    # If there is a flush, create a new list that only contains cards of that suit and check for a straight.
+    if flush_suit is not CardType.HIDDEN:
+        filtered_list = [card for card in card_list if card.get_suit() is flush_suit]
+        return _find_straight(filtered_list)
+
+    return CardType.HIDDEN
+
+
+def _find_full_house(card_list: list[Card]):
+    """
+    Search algorithm to determine if there is a full house in the provided list of cards.
+    A full house is defined as a set of three of a kind as well as a pair. If a full house is detected, the CardType
+    enum of the trip set is returned.
+
+    :param card_list: List of Card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: CardType enum of the three of a kind portion of the full house. If no full house is found,
+    returns CardType.HIDDEN.
+    """
+
+    trips = _find_multiples(card_list, 3)
+
+    # if there is a set of trips and another pair, return the trips CardType enum.
+    if trips is not CardType.HIDDEN:
+        filtered_list = [card for card in card_list if card.get_type() is not trips]
+        if _find_multiples(filtered_list, 2) is not CardType.HIDDEN:
+            return trips
+
     return CardType.HIDDEN
 
 
