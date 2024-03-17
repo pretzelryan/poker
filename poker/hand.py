@@ -8,10 +8,8 @@
 # Standard packages
 from collections import Counter
 
-
 # Package imports.
 from .card import *
-
 
 CARDS_IN_STRAIGHT = 5
 CARDS_IN_FLUSH = 5
@@ -206,6 +204,7 @@ class Hand:
     Class to determine the strength of a player's hand.
 
     """
+
     def __init__(self):
         """
         Constructor.
@@ -239,68 +238,38 @@ class Hand:
         :return: None.
         """
 
-        # Prepare the card list by removing hidden cards and sorting high to low.
+        # Prepare the card list by removing hidden cards and sorting cards by type from high to low.
         self._filter_hidden_cards()
         self._sort_cards()
 
-        # Check for strongest hands first so that the program can end early once the strongest hand is found.
+        # Dictionary matches hand types with corresponding function call (excluding royal/straight flush or high card).
+        # If the function call returns a value that is not equal to CardType.HIDDEN, then that hand type is present.
+        hand_dict = {HandType.QUADS:        _find_multiples(self.card_list, 4),
+                     HandType.FULL_HOUSE:   _find_full_house(self.card_list),
+                     HandType.FLUSH:        _find_flush(self.card_list),
+                     HandType.STRAIGHT:     _find_straight(self.card_list),
+                     HandType.TRIPS:        _find_multiples(self.card_list, 3),
+                     HandType.TWO_PAIR:     _find_two_pair(self.card_list),
+                     HandType.PAIR:         _find_multiples(self.card_list, 2)}
 
-        # Could you instead loop through a dict instead of the elif statements?
-        # self.hand_type = HandType.HIGH_CARD
-        # hand_dict = {HandType.QUADS: _find_multiples(self.card_list, 4),
-        #             HandType.FULL_HOUSE: _find_full_house(self.card_list),
-        #             HandType.FLUSH: _find_flush(self.card_list),
-        #             HandType.STRAIGHT: _find_straight(self.card_list),
-        #             HandType.TRIPS: _find_multiples(self.card_list, 3),
-        #             HandType.TWO_PAIR: _find_two_pair(self.card_list),
-        #             HandType.PAIR: _find_multiples(self.card_list, 2)}
-        #
-        # After Royal/Straight Flush determination
-        # else:
-        #     for hand in hand_dict:
-        #         if hand_dict[hand] is not CardType.HIDDEN:
-        #             self.hand_type = hand
-        #             break
+        # Assume HandType.HIGH_CARD, which will be overwrote if a stronger hand is found.
+        self.hand_type = HandType.HIGH_CARD
 
-        # Royal/Straight flush.
+        # Check for royal/straight flush differently due to more complex logic.
         straight_flush_card_type = _find_straight_flush(self.card_list)
         if straight_flush_card_type is not CardType.HIDDEN:
+            # A royal flush is simply an ace high straight flush.
             if straight_flush_card_type is CardType.ACE:
                 self.hand_type = HandType.ROYAL_FLUSH
             else:
                 self.hand_type = HandType.STRAIGHT_FLUSH
 
-        # Quads.
-        elif _find_multiples(self.card_list, 4) is not CardType.HIDDEN:
-            self.hand_type = HandType.QUADS
-
-        # Full house.
-        elif _find_full_house(self.card_list) is not CardType.HIDDEN:
-            self.hand_type = HandType.FULL_HOUSE
-
-        # Flush.
-        elif _find_flush(self.card_list) is not CardType.HIDDEN:
-            self.hand_type = HandType.FLUSH
-
-        # Straight.
-        elif _find_straight(self.card_list) is not CardType.HIDDEN:
-            self.hand_type = HandType.STRAIGHT
-
-        # Trips.
-        elif _find_multiples(self.card_list, 3) is not CardType.HIDDEN:
-            self.hand_type = HandType.TRIPS
-
-        # Two Pair
-        elif _find_two_pair(self.card_list) is not CardType.HIDDEN:
-            self.hand_type = HandType.TWO_PAIR
-
-        # Pair
-        elif _find_multiples(self.card_list, 2) is not CardType.HIDDEN:
-            self.hand_type = HandType.PAIR
-
-        # Hand must be High card.
+        # If there is no royal/straight flush, iterate through the dictionary to check the rest of the hand types.
         else:
-            self.hand_type = HandType.HIGH_CARD
+            for hand in hand_dict:
+                if hand_dict[hand] is not CardType.HIDDEN:
+                    self.hand_type = hand
+                    break
 
     def update_hand_list(self):
         """
