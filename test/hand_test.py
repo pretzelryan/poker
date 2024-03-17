@@ -227,8 +227,90 @@ class TestHand(unittest.TestCase):
             new_hand.add_card(new_card)
 
         new_hand.evaluate_hand()
-        self.assertEqual(new_hand.get_hand_type(), hand.HandType.FLUSH, "TEST12: Expected HandType.FLUSH. "
+        self.assertEqual(new_hand.get_hand_type(), hand.HandType.FLUSH, "TEST13: Expected HandType.FLUSH. "
                                                                            "Actual " + str(new_hand.get_hand_type()))
+
+    def test_full_house(self):
+        new_hand = hand.Hand()
+
+        for i in range(1, 4):
+            new_card = card.Card(i, 11)     # Generate Jack of Spades, Hearts, and Diamonds.
+            new_card.reveal_card()
+            new_hand.add_card(new_card)
+
+        new_card = card.Card(2, 5)          # Five of Hearts.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        for i in range(1, 4):
+            new_card = card.Card(i, 3)      # Generate Three of Spades, Hearts, and Diamonds.
+            new_card.reveal_card()
+            new_hand.add_card(new_card)
+
+        new_hand.evaluate_hand()
+        self.assertEqual(new_hand.get_hand_type(), hand.HandType.FULL_HOUSE, "TEST14: Expected HandType.FULL_HOUSE. "
+                                                                        "Actual " + str(new_hand.get_hand_type()))
+
+    def test_quads(self):
+        new_hand = hand.Hand()
+
+        for i in range(1, 5):
+            new_card = card.Card(i, 8)      # Generate 8 of every suit.
+            new_card.reveal_card()
+            new_hand.add_card(new_card)
+
+        new_card = card.Card(1, 10)         # Ten of Spades.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_card = card.Card(2, 3)          # Three of Hearts.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_hand.evaluate_hand()
+        self.assertEqual(new_hand.get_hand_type(), hand.HandType.QUADS, "TEST15: Expected HandType.QUADS. "
+                                                                        "Actual " + str(new_hand.get_hand_type()))
+
+    def test_straight_flush(self):
+        new_hand = hand.Hand()
+
+        for i in range(5, 10):
+            new_card = card.Card(1, i)      # Generate 5 through 9 of Spades.
+            new_card.reveal_card()
+            new_hand.add_card(new_card)
+
+        new_card = card.Card(2, 10)         # Ten of Hearts.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_card = card.Card(1, 14)         # Ace of Spades.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_hand.evaluate_hand()
+        self.assertEqual(new_hand.get_hand_type(), hand.HandType.STRAIGHT_FLUSH, "TEST16: "
+                                                                        "Expected HandType.STRAIGHT_FLUSH. "
+                                                                        "Actual " + str(new_hand.get_hand_type()))
+
+    def test_royal_flush(self):
+        new_hand = hand.Hand()
+
+        for i in range(10, 15):
+            new_card = card.Card(1, i)      # Generate 10 through Ace of Spades.
+            new_card.reveal_card()
+            new_hand.add_card(new_card)
+
+        new_card = card.Card(2, 10)         # Ten of Hearts.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_card = card.Card(3, 12)         # Queen of Clubs.
+        new_card.reveal_card()
+        new_hand.add_card(new_card)
+
+        new_hand.evaluate_hand()
+        self.assertEqual(new_hand.get_hand_type(), hand.HandType.ROYAL_FLUSH, "TEST17: Expected HandType.ROYAL_FLUSH. "
+                                                                        "Actual " + str(new_hand.get_hand_type()))
 
 
 if __name__ == "__main__":
