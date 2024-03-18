@@ -7,6 +7,7 @@
 
 # Standard packages.
 import random
+from enum import Enum
 
 
 # Package imports.
@@ -31,9 +32,21 @@ def generate_deck():
     return deck
 
 
+class DealType(Enum):
+    """
+    Enumeration for representing different stages in dealing the community cards.
+
+    """
+    PRE_FLOP = 0
+    FLOP = 1
+    TURN = 2
+    RIVER = 3
+
+
 class Deck:
     """
-    Class to track all of the cards in the
+    Class to track all of the cards in the deck.
+
     """
 
     def __init__(self):
@@ -43,9 +56,7 @@ class Deck:
         """
         self.cards = generate_deck()
         self.burn_pile = []
-        self.flop = []
-        self.turn = []
-        self.river = []
+        self.community_cards = []
 
     def shuffle(self):
         """
@@ -79,8 +90,8 @@ class Deck:
         """
         self.burn_card()
         for card in range(FLOP_CARD_COUNT):
-            self.flop.append(self.deal_card())
-            self.flop[card].reveal_card()
+            self.community_cards.append(self.deal_card())
+            self.community_cards[card].reveal_card()
 
     def deal_turn(self):
         """
@@ -90,8 +101,8 @@ class Deck:
         """
         self.burn_card()
         for card in range(TURN_CARD_COUNT):
-            self.turn.append(self.deal_card())
-            self.turn[card].reveal_card()
+            self.community_cards.append(self.deal_card())
+            self.community_cards[card].reveal_card()
 
     def deal_river(self):
         """
@@ -101,5 +112,5 @@ class Deck:
         """
         self.burn_card()
         for card in range(TURN_CARD_COUNT):
-            self.turn.append(self.deal_card())
-            self.turn[card].reveal_card()
+            self.community_cards.append(self.deal_card())
+            self.community_cards[card].reveal_card()
