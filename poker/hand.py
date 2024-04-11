@@ -13,6 +13,7 @@ from .card import *
 
 CARDS_IN_STRAIGHT = 5
 CARDS_IN_FLUSH = 5
+MAX_CARDS_IN_HAND = 5
 
 
 class HandType(Enum):
@@ -47,7 +48,8 @@ def _find_multiples(card_list: list[Card], count: int):
     card_type_list = [card.get_type() for card in card_list]
     count_dict = Counter(card_type_list)
 
-    # Check each element in the generated
+    # FIXME: Should should the comparison be equal to instead of greater than equal to?
+    # Check count of each cardType
     for card_type in count_dict:
         if count_dict[card_type] >= count:
             return card_type
@@ -207,10 +209,82 @@ def _get_high_card_list(card_list: list[Card], count: int):
     :param count: Maximum length of the returned list
     :return: List of highest card objects, up to length count.
     """
+
+    # if count exceeds card_list length, then card list will be returned (handled by list slicing).
     return card_list[:count]
 
 
+def _get_multiples(card_list: list[Card], count: int):
+    """
+    Gets a list of card objects with the same cardType from the provided card_list. The length of the returned list is
+    equal to count, where count is the number of expected multiples.
+
+    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param count: Number of multiples expected.  Ex: If trips is expected, count = 3.
+    :return: List of card objects of the multiples found. If sufficient multiples are not found, returns empty list.
+    """
+
+    return_card_type = _find_multiples(card_list, count)
+    if return_card_type is not CardType.HIDDEN:
+        return [card for card in card_list if card.get_type() is return_card_type]
+
+    return []
+
+
 def _get_pair_list(card_list: list[Card], pair_count: int):
+    """
+    Gets a list of card objects, with pairs placed at the start of the list. The highest pair will be placed at the
+    start of the list, and the second largest pair will be placed next. Once the pairs are placed, the remaining
+    highest cards will be placed in descending order.
+
+    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param pair_count: Number of pairs expected.
+    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
+    """
+
+    # Verify that pair_count cannot exceed 2.
+    # This function should be statically called, so this error should never be thrown.
+    if pair_count > 2:
+        raise ValueError("Cannot get more than two pairs.")
+
+    # for pair_count get the pair cardType -> put those in the list first -> get remaining high cards
+    # TODO
+    pass
+
+
+def _get_trips_list(card_list: list[Card]):
+    """
+
+
+    :param card_list:
+    :return:
+    """
+
+    # TODO
+    pass
+
+
+def _get_quads_list(card_list: list[Card]):
+
+    # TODO
+    pass
+
+
+def _get_flush_list(card_list: list[Card]):
+
+    # TODO
+    pass
+
+
+def _get_straight_list(card_list: list[Card]):
+
+    # TODO
+    pass
+
+
+def _get_straight_flush_list(card_list: list[Card]):
+
+    # TODO
     pass
 
 
