@@ -199,11 +199,32 @@ def _find_two_pair(card_list: list[Card]):
     return CardType.HIDDEN
 
 
+def _get_high_card_list(card_list: list[Card], count: int):
+    """
+    Gets a list of the highest cards in order from the given card list, of length up to count.
+
+    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param count: Maximum length of the returned list
+    :return: List of highest card objects, up to length count.
+    """
+    return card_list[:count]
+
+
+def _get_pair_list(card_list: list[Card], pair_count: int):
+    pass
+
+
 class Hand:
     """
     Class to determine the strength of a player's hand.
 
     """
+
+    ###########################################################################
+    #
+    # Public API.
+    #
+    ###########################################################################
 
     def __init__(self):
         """
@@ -278,6 +299,20 @@ class Hand:
         :return: None.
         """
 
+        # pseudocode for different cases
+        #
+        # straight/royal flush -> filter flush and get top 5 cards from starting card
+        # quads -> get all 4 quad cards, then get the next highest card
+        # full house -> get the highest trips set, then get the next highest pair
+        # flush -> get the highest 5 card of the given suit
+        # straight -> get the highest 5 cards in a row
+        # trips -> get the trip set, then the next highest 2 cards
+        # two pair -> get the top 2 pairs (in order), then the highest remaining card
+        # pair -> get the top pair, then the next highest 3 cards
+        # high card -> get the highest 5 cards
+        #
+        # NOTE: the searching functions return cardType/suit enums.  Now I want to get the card object itself.
+
     def append_card_list(self, card_list: list[Card]):
         """
         Add a specified list of cards to the list of cards.
@@ -285,7 +320,10 @@ class Hand:
         :param card_list: List of card objects to be added.
         :return: None.
         """
-        self.card_list += card_list
+
+        # make sure that all of the elements are cards before adding
+        if all(type(card) is Card for card in card_list):
+            self.card_list += card_list
 
     def add_card(self, card: Card):
         """
@@ -294,7 +332,8 @@ class Hand:
         :param card: Card object to be added
         :return: None.
         """
-        self.card_list.append(card)
+        if type(card) is Card:
+            self.card_list.append(card)
 
     def clear_card_list(self):
         """
@@ -303,6 +342,12 @@ class Hand:
         :return: None.
         """
         self.card_list = []
+
+    ###########################################################################
+    #
+    # Private API.
+    #
+    ###########################################################################
 
     def _filter_hidden_cards(self):
         """
