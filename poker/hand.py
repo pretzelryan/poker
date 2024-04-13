@@ -487,19 +487,19 @@ class Hand:
         :return: None.
         """
 
-        # pseudocode for different cases
-        #
-        # straight/royal flush -> filter flush and get top 5 cards from starting card
-        # quads -> get all 4 quad cards, then get the next highest card
-        # full house -> get the highest trips set, then get the next highest pair
-        # flush -> get the highest 5 card of the given suit
-        # straight -> get the highest 5 cards in a row
-        # trips -> get the trip set, then the next highest 2 cards
-        # two pair -> get the top 2 pairs (in order), then the highest remaining card
-        # pair -> get the top pair, then the next highest 3 cards
-        # high card -> get the highest 5 cards
-        #
-        # NOTE: the searching functions return cardType/suit enums.  Now I want to get the card object itself.
+        # Depending on the hand that was detected, call the corresponding get list function.
+        hand_type_dict = {HandType.ROYAL_FLUSH:    _get_straight_flush_list(self.card_list),
+                          HandType.STRAIGHT_FLUSH: _get_straight_flush_list(self.card_list),
+                          HandType.QUADS:          _get_set_list(self.card_list, CARDS_IN_QUADS),
+                          HandType.FULL_HOUSE:     _get_full_house_list(self.card_list),
+                          HandType.FLUSH:          _get_flush_list(self.card_list),
+                          HandType.STRAIGHT:       _get_straight_list(self.card_list),
+                          HandType.TRIPS:          _get_set_list(self.card_list, CARDS_IN_TRIPS),
+                          HandType.TWO_PAIR:       _get_pair_list(self.card_list, 2),
+                          HandType.PAIR:           _get_pair_list(self.card_list, 1),
+                          HandType.HIGH_CARD:      _get_high_card_list(self.card_list, MAX_CARDS_IN_HAND)}
+
+        self.best_hand = hand_type_dict[self.hand_type]
 
     def append_card_list(self, card_list: list[Card]):
         """
