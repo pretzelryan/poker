@@ -260,51 +260,37 @@ def _get_pair_list(card_list: list[Card], pair_count: int):
         return_list.extend(_get_multiples(card_list, 2))
         card_list = [card for card in card_list if card not in return_list]
 
+    # If the length does not match then the pairs were not found.
+    if len(return_list) != pair_count * CARDS_IN_PAIR:
+        raise AttributeError("get_pair_list: HandType does not match attempted best_hand assignment.")
+
     # fill remaining cards with the next highest cards.
     remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
     return_list.extend(_get_high_card_list(card_list, remaining_card_count))
     return return_list
 
 
-def _get_trips_list(card_list: list[Card]):
+def _get_set_list(card_list: list[Card], cards_in_set: int):
     """
-    Gets a list of card objects, with a set of three of a kind at the start of the list. After the set, the next
-    highest cards will be placed in the list. Cards must exist in provided card_list.
+    Gets a list of card objects, with a set of multiple cards specified put at the start of the returned list.
+    After the set, the next highest cards will be placed in the list. Cards must exist in the provided card_list.
 
     :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :param cards_in_set: Number of multiples expected.
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
     return_list = []
 
     # Add the trips set to return_list and filter trips cards out of the card_list.
-    return_list.extend(_get_multiples(card_list, CARDS_IN_TRIPS))
+    return_list.extend(_get_multiples(card_list, cards_in_set))
     card_list = [card for card in card_list if card not in return_list]
+
+    # If the length does not match, trips was not found.
+    if len(return_list) != cards_in_set:
+        raise AttributeError("get_set_list: HandType does not match attempted best_hand assignment.")
 
     # add the remaining high cards to return_list.
-    remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
-    return_list.extend(_get_high_card_list(card_list, remaining_card_count))
-
-    return return_list
-
-
-def _get_quads_list(card_list: list[Card]):
-    """
-    Gets a list of card objects, with a set of four of a kind at the start of the list. After the set, the next
-    highest card will be placed in the list. Cards must exist in provided card_list.
-
-    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
-    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
-    """
-
-    # FIXME: Nice way to combine quads list and trips list? They are practically the same code with one param change.
-    return_list = []
-
-    # Add the quads set to return_list and filter those cards out of the card_list.
-    return_list.extend(_get_multiples(card_list, CARDS_IN_QUADS))
-    card_list = [card for card in card_list if card not in return_list]
-
-    # Add remaining high cards to return_list.
     remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
     return_list.extend(_get_high_card_list(card_list, remaining_card_count))
 
@@ -389,7 +375,8 @@ def _get_straight_list(card_list: list[Card]):
             elif card_list[i].get_type().value != card_list[i - 1].get_type().value:
                 return_list = [card_list[i]]
 
-    return []
+    # Straight not found, raise error.
+    raise AttributeError("get_straight_list: HandType does not match attempted best_hand assignment.")
 
 
 def _get_straight_flush_list(card_list: list[Card]):
