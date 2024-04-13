@@ -11,8 +11,12 @@ from collections import Counter
 # Package imports.
 from .card import *
 
+# static global variables
 CARDS_IN_STRAIGHT = 5
 CARDS_IN_FLUSH = 5
+CARDS_IN_PAIR = 2
+CARDS_IN_TRIPS = 3
+CARDS_IN_QUADS = 4
 MAX_CARDS_IN_HAND = 5
 
 
@@ -118,19 +122,21 @@ def _find_straight(card_list: list[Card]):
     # If there are sufficient cards, iterate through the list and look for a 5 in a row.
     # Keep track of the first card in the row, and count if there are 4 more consecutive cards.
     if len(card_type_list) >= CARDS_IN_STRAIGHT:
-        consecutive_cards = 1
-        start_card = card_type_list[0]
-        for i in range(len(card_type_list) - 1):
-            consecutive_cards += 1
 
-            # If the consecutive streak is broken then reset the starting card and the consecutive counter.
-            if card_type_list[i].value != (card_type_list[i + 1].value + 1):
-                consecutive_cards = 1
-                start_card = card_type_list[i + 1]
+        # Assign the first item as the start of the straight and start iteration from the second element.
+        straight_start = card_type_list[0]
+        for i in range(1, len(card_type_list)):
 
-            # If there are sufficient cards in a row then return the highest (first) card in the straight.
-            if consecutive_cards >= CARDS_IN_STRAIGHT:
-                return start_card
+            # If the current card value is one less than the previous card, the straight continues
+            if card_type_list[i].value == card_type_list[i - 1].value - 1:
+
+                # If the straight is sufficiently long, return straight_start.
+                if i - card_type_list.index(straight_start) >= CARDS_IN_STRAIGHT - 1:
+                    return straight_start
+
+            # Straight is broken, reset the starting card.
+            else:
+                straight_start = card_type_list[i]
 
     # If a straight is not found.
     return CardType.HIDDEN
@@ -169,12 +175,12 @@ def _find_full_house(card_list: list[Card]):
     returns CardType.HIDDEN.
     """
 
-    trips = _find_multiples(card_list, 3)
+    trips = _find_multiples(card_list, CARDS_IN_TRIPS)
 
     # If there is a set of trips and another pair, return the trips CardType enum.
     if trips is not CardType.HIDDEN:
         filtered_list = [card for card in card_list if card.get_type() is not trips]
-        if _find_multiples(filtered_list, 2) is not CardType.HIDDEN:
+        if _find_multiples(filtered_list, CARDS_IN_PAIR) is not CardType.HIDDEN:
             return trips
 
     return CardType.HIDDEN
@@ -189,12 +195,12 @@ def _find_two_pair(card_list: list[Card]):
     :return: CardType enum of the largest pair in the two pair. If no two pair is found, returns CardType.HIDDEN.
     """
 
-    large_pair = _find_multiples(card_list, 2)
+    large_pair = _find_multiples(card_list, CARDS_IN_PAIR)
 
     # If there is a pair and another pair, return the highest pair CardType enum.
     if large_pair is not CardType.HIDDEN:
         filtered_list = [card for card in card_list if card.get_type() is not large_pair]
-        if _find_multiples(filtered_list, 2) is not CardType.HIDDEN:
+        if _find_multiples(filtered_list, CARDS_IN_PAIR) is not CardType.HIDDEN:
             return large_pair
 
     return CardType.HIDDEN
@@ -244,11 +250,20 @@ def _get_pair_list(card_list: list[Card], pair_count: int):
     # Verify that pair_count cannot exceed 2.
     # This function should be statically called, so this error should never be thrown.
     if pair_count > 2:
-        raise ValueError("_get_pair_list cannot get more than two pairs.")
+        raise ValueError("_get_pair_list() cannot get more than two pairs.")
 
-    # for pair_count get the pair cardType -> put those in the list first -> get remaining high cards
-    # TODO
-    pass
+    return_list = []
+
+    # For pair_count get the paired cards and add them to return_list.
+    for pair in range(pair_count):
+        # add a pair, then filter that card out of the card_list.
+        return_list.extend(_get_multiples(card_list, 2))
+        card_list = [card for card in card_list if card not in return_list]
+
+    # fill remaining cards with the next highest cards.
+    remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
+    return_list.extend(_get_high_card_list(card_list, remaining_card_count))
+    return return_list
 
 
 def _get_trips_list(card_list: list[Card]):
@@ -260,8 +275,17 @@ def _get_trips_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
-    # TODO
-    pass
+    return_list = []
+
+    # Add the trips set to return_list and filter trips cards out of the card_list.
+    return_list.extend(_get_multiples(card_list, CARDS_IN_TRIPS))
+    card_list = [card for card in card_list if card not in return_list]
+
+    # add the remaining high cards to return_list.
+    remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
+    return_list.extend(_get_high_card_list(card_list, remaining_card_count))
+
+    return return_list
 
 
 def _get_quads_list(card_list: list[Card]):
@@ -273,8 +297,18 @@ def _get_quads_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
-    # TODO
-    pass
+    # FIXME: Nice way to combine quads list and trips list? They are practically the same code with one param change.
+    return_list = []
+
+    # Add the quads set to return_list and filter those cards out of the card_list.
+    return_list.extend(_get_multiples(card_list, CARDS_IN_QUADS))
+    card_list = [card for card in card_list if card not in return_list]
+
+    # Add remaining high cards to return_list.
+    remaining_card_count = MAX_CARDS_IN_HAND - len(return_list)
+    return_list.extend(_get_high_card_list(card_list, remaining_card_count))
+
+    return return_list
 
 
 def _get_full_house_list(card_list: list[Card]):
@@ -287,8 +321,20 @@ def _get_full_house_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
-    # TODO
-    pass
+    return_list = []
+
+    # Add trips set to return_list and filter those cards out of card_list.
+    return_list.extend(_get_multiples(card_list, CARDS_IN_TRIPS))
+    card_list = [card for card in card_list if card not in return_list]
+
+    # Add pair to return_list
+    return_list.extend(_get_multiples(card_list, CARDS_IN_PAIR))
+
+    # if the length is wrong, then this hand cannot be a full house.
+    if len(return_list) != MAX_CARDS_IN_HAND:
+        raise AttributeError("get_full_house_list: HandType does not match attempted best_hand assignment.")
+
+    return return_list
 
 
 def _get_flush_list(card_list: list[Card]):
@@ -300,8 +346,17 @@ def _get_flush_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
-    # TODO
-    pass
+    return_list = []
+
+    # Find flush list and filter cards to only be of that suit. If the suit is hidden, there is no flush.
+    flush_suit = _find_flush_suit(card_list)
+    if flush_suit is Suit.HIDDEN:
+        raise AttributeError("get_flush_list: HandType does not match attempted best_hand assignment.")
+
+    card_list = [card for card in card_list if card.get_suit() is flush_suit]
+    return_list.extend(_get_high_card_list(card_list, CARDS_IN_FLUSH))
+
+    return return_list
 
 
 def _get_straight_list(card_list: list[Card]):
@@ -313,8 +368,28 @@ def _get_straight_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_LIST.
     """
 
-    # TODO
-    pass
+    # If there is an ace at the start of the list, add a low ace at the end of the list (of same suit).
+    if card_list[0].get_type() == CardType.ACE:
+        card_list.append(Card(card_list[0].get_suit(), 1))
+        card_list[-1].reveal_card()
+
+    # Find the start value of the straight
+    if len(card_list) >= CARDS_IN_STRAIGHT:
+        return_list = [card_list[0]]
+
+        for i in range(1, len(card_list)):
+            # If the previous card is one bigger than the current card, add the current card to the list
+            if card_list[i].get_type().value == card_list[i - 1].get_type().value - 1:
+                return_list.append(card_list[i])
+
+                if len(return_list) >= 5:
+                    return return_list
+
+            # If the previous card is not the same as current card, the straight is broken and should be reset.
+            elif card_list[i].get_type().value != card_list[i - 1].get_type().value:
+                return_list = [card_list[i]]
+
+    return []
 
 
 def _get_straight_flush_list(card_list: list[Card]):
@@ -381,13 +456,13 @@ class Hand:
 
         # Dictionary matches hand types with corresponding function call (excluding royal/straight flush or high card).
         # If the function call returns a value that is not equal to CardType.HIDDEN, then that hand type is present.
-        hand_dict = {HandType.QUADS:        _find_multiples(self.card_list, 4),
+        hand_dict = {HandType.QUADS:        _find_multiples(self.card_list, CARDS_IN_QUADS),
                      HandType.FULL_HOUSE:   _find_full_house(self.card_list),
                      HandType.FLUSH:        _find_flush(self.card_list),
                      HandType.STRAIGHT:     _find_straight(self.card_list),
-                     HandType.TRIPS:        _find_multiples(self.card_list, 3),
+                     HandType.TRIPS:        _find_multiples(self.card_list, CARDS_IN_TRIPS),
                      HandType.TWO_PAIR:     _find_two_pair(self.card_list),
-                     HandType.PAIR:         _find_multiples(self.card_list, 2)}
+                     HandType.PAIR:         _find_multiples(self.card_list, CARDS_IN_PAIR)}
 
         # Assume HandType.HIGH_CARD, which will be overwrote if a stronger hand is found.
         self.hand_type = HandType.HIGH_CARD
