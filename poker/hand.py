@@ -478,7 +478,7 @@ class Hand:
                     break
 
         # TODO: Should update_hand_list() be a private function?
-        # self.update_hand_list()
+        self.update_hand_list()
 
     def update_hand_list(self):
         """
