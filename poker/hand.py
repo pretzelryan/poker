@@ -497,7 +497,8 @@ class Hand:
                           HandType.TRIPS:          _get_set_list(self.card_list, CARDS_IN_TRIPS),
                           HandType.TWO_PAIR:       _get_pair_list(self.card_list, 2),
                           HandType.PAIR:           _get_pair_list(self.card_list, 1),
-                          HandType.HIGH_CARD:      _get_high_card_list(self.card_list, MAX_CARDS_IN_HAND)}
+                          HandType.HIGH_CARD:      _get_high_card_list(self.card_list, MAX_CARDS_IN_HAND),
+                          HandType.HIDDEN:         []}
 
         self.best_hand = hand_type_dict[self.hand_type]
 
