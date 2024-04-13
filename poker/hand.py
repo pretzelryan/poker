@@ -388,8 +388,15 @@ def _get_straight_flush_list(card_list: list[Card]):
     :return: List of card objects, up to length MAX_CARDS_IN_LIST.
     """
 
-    # TODO
-    pass
+    # Filter for only flush cards, then call to get the straight.
+    flush_suit = _find_flush_suit(card_list)
+    card_list = [card for card in card_list if card.get_suit() is flush_suit]
+
+    # If straight is not found, exception will be thrown from get_straight_list() function.
+    try:
+        return _get_straight_list(card_list)
+    except AttributeError as e:
+        raise AttributeError("get_straight_flush_list: HandType does not match attempted best_hand assignment.") from e
 
 
 class Hand:
