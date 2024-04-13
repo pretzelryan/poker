@@ -48,7 +48,6 @@ def _find_multiples(card_list: list[Card], count: int):
     card_type_list = [card.get_type() for card in card_list]
     count_dict = Counter(card_type_list)
 
-    # FIXME: Should should the comparison be equal to instead of greater than equal to?
     # Check count of each cardType
     for card_type in count_dict:
         if count_dict[card_type] >= count:
@@ -205,7 +204,7 @@ def _get_high_card_list(card_list: list[Card], count: int):
     """
     Gets a list of the highest cards in order from the given card list, of length up to count.
 
-    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
     :param count: Maximum length of the returned list
     :return: List of highest card objects, up to length count.
     """
@@ -217,9 +216,9 @@ def _get_high_card_list(card_list: list[Card], count: int):
 def _get_multiples(card_list: list[Card], count: int):
     """
     Gets a list of card objects with the same cardType from the provided card_list. The length of the returned list is
-    equal to count, where count is the number of expected multiples.
+    equal to count, where count is the number of expected multiples. Cards must exist in provided card_list.
 
-    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
     :param count: Number of multiples expected.  Ex: If trips is expected, count = 3.
     :return: List of card objects of the multiples found. If sufficient multiples are not found, returns empty list.
     """
@@ -235,9 +234,9 @@ def _get_pair_list(card_list: list[Card], pair_count: int):
     """
     Gets a list of card objects, with pairs placed at the start of the list. The highest pair will be placed at the
     start of the list, and the second largest pair will be placed next. Once the pairs are placed, the remaining
-    highest cards will be placed in descending order.
+    highest cards will be placed in descending order. Cards must exist in provided card_list.
 
-    :param card_list: List of card object. Should be sorted high to low and hidden cards filtered before function call.
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
     :param pair_count: Number of pairs expected.
     :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
@@ -245,7 +244,7 @@ def _get_pair_list(card_list: list[Card], pair_count: int):
     # Verify that pair_count cannot exceed 2.
     # This function should be statically called, so this error should never be thrown.
     if pair_count > 2:
-        raise ValueError("Cannot get more than two pairs.")
+        raise ValueError("_get_pair_list cannot get more than two pairs.")
 
     # for pair_count get the pair cardType -> put those in the list first -> get remaining high cards
     # TODO
@@ -254,10 +253,11 @@ def _get_pair_list(card_list: list[Card], pair_count: int):
 
 def _get_trips_list(card_list: list[Card]):
     """
+    Gets a list of card objects, with a set of three of a kind at the start of the list. After the set, the next
+    highest cards will be placed in the list. Cards must exist in provided card_list.
 
-
-    :param card_list:
-    :return:
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
     """
 
     # TODO
@@ -265,24 +265,66 @@ def _get_trips_list(card_list: list[Card]):
 
 
 def _get_quads_list(card_list: list[Card]):
+    """
+    Gets a list of card objects, with a set of four of a kind at the start of the list. After the set, the next
+    highest card will be placed in the list. Cards must exist in provided card_list.
+
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
+    """
+
+    # TODO
+    pass
+
+
+def _get_full_house_list(card_list: list[Card]):
+    """
+    Gets a list of card objects, with a set of three of a kind first, followed by a pair. If two sets of three of a
+    kind are present, the three of a kind set with a higher value will be placed at the start of the list. Cards
+    must exist in provided card_list.
+
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
+    """
 
     # TODO
     pass
 
 
 def _get_flush_list(card_list: list[Card]):
+    """
+    Gets a list of card objects of the same suit, ordered value highest to lowest. Cards must exist in provided
+    card_list.
+
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_HAND.
+    """
 
     # TODO
     pass
 
 
 def _get_straight_list(card_list: list[Card]):
+    """
+    Gets a list of card objects that are in a row, ordered highest value to lowest. Cards must exist in provided
+    card_list.
+
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_LIST.
+    """
 
     # TODO
     pass
 
 
 def _get_straight_flush_list(card_list: list[Card]):
+    """
+    Gets a list of card objects that are all suited and in a row, ordered highest value to lowest. Cards must exist
+    in provided card_list.
+
+    :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
+    :return: List of card objects, up to length MAX_CARDS_IN_LIST.
+    """
 
     # TODO
     pass
@@ -365,6 +407,9 @@ class Hand:
                 if hand_dict[hand] is not CardType.HIDDEN:
                     self.hand_type = hand
                     break
+
+        # TODO: Should update_hand_list() be a private function?
+        # self.update_hand_list()
 
     def update_hand_list(self):
         """
