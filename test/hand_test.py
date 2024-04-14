@@ -124,8 +124,8 @@ class TestHand(unittest.TestCase):
     def test_high_card(self):
         new_hand = hand.Hand()
 
-        for i in range(2, 12, 2):
-            new_card = card.Card(i % 3 + 1, i)      # Generate 2, 4, 6, 8, and 10 of alternating suits.
+        for i in range(2, 14, 2):
+            new_card = card.Card(i % 3 + 1, i)      # Generate 2, 4, 6, 8, 10, and Queen of alternating suits.
             new_card.reveal_card()
             new_hand.add_card(new_card)
 
