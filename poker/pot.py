@@ -20,20 +20,20 @@ class Pot:
         Constructor.
 
         """
-        self.chip_total = float(0)
+        self.pot_total = float(0)
         self.player_list = []
         self.betting_active = True
 
     def __repr__(self):
-        return "Pot size: " + str(self.get_chip_total())
+        return f"Pot size: {self.get_pot_total()}"
 
-    def get_chip_total(self) -> float:
+    def get_pot_total(self) -> float:
         """
         Accessor for the total chips in the pot.
 
         :return: Float for the total number of chips.
         """
-        return self.chip_total
+        return self.pot_total
 
     def add_player(self, player: Player):
         """

@@ -19,21 +19,21 @@ class Player:
 
     """
 
-    def __init__(self, name: str, chip_count: float):
+    def __init__(self, name: str, stack: float):
         """
         Constructor.
 
         :param name: String for the player's name.
-        :param chip_count: Float for the amount of money the player started with.
+        :param stack: Float for the amount of money the player started with.
         """
 
         self.name = name
-        self.chip_count = chip_count
+        self.stack = stack
         self.pocket = []
         self.active = True
 
     def __repr__(self):
-        return self.name
+        return f"{self.name} (Stack: {self.stack})"
 
     def get_pocket(self):
         """
@@ -43,13 +43,13 @@ class Player:
         """
         return self.pocket
 
-    def get_chip_count(self):
+    def get_stack(self):
         """
         Accessor for the player's chip count.
 
         :return: Float of player's chips.
         """
-        return self.chip_count
+        return self.stack
 
     def is_player_active(self):
         """
@@ -96,8 +96,8 @@ class Player:
         :param amount: Float amount of chips the player is betting.
         :return: Float amount bet.
         """
-        if amount < self.chip_count:
-            self.chip_count -= amount
+        if amount < self.stack:
+            self.stack -= amount
             return amount
         else:
             return self.all_in()
@@ -126,8 +126,8 @@ class Player:
         :param current_bet: Float amount of chips that other players have bet.
         :return: Float amount of chips this player is matching with.
         """
-        if current_bet < self.chip_count:
-            self.chip_count -= current_bet
+        if current_bet < self.stack:
+            self.stack -= current_bet
             return current_bet
         else:
             return self.all_in()
@@ -149,6 +149,6 @@ class Player:
 
         :return: Float amount bet.
         """
-        chips_bet = self.chip_count
-        self.chip_count = 0
+        chips_bet = self.stack
+        self.stack = 0
         return chips_bet
