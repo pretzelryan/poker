@@ -7,6 +7,7 @@
 
 # Standard packages
 from collections import Counter
+from functools import partial
 
 # Package imports.
 from .card import *
@@ -18,6 +19,8 @@ CARDS_IN_PAIR = 2
 CARDS_IN_TRIPS = 3
 CARDS_IN_QUADS = 4
 MAX_CARDS_IN_HAND = 5
+PAIRS_IN_TWO_PAIR = 2
+PAIRS_IN_ONE_PAIR = 1
 
 
 class HandType(Enum):
@@ -226,12 +229,13 @@ def _get_multiples(card_list: list[Card], count: int):
 
     :param card_list: List of card objects. Should be sorted high to low and hidden cards filtered before function call.
     :param count: Number of multiples expected.  Ex: If trips is expected, count = 3.
-    :return: List of card objects of the multiples found. If sufficient multiples are not found, returns empty list.
+    :return: List of card objects of the multiples found, up to list count. If sufficient multiples are not found,
+    returns empty list.
     """
 
     return_card_type = _find_multiples(card_list, count)
     if return_card_type is not CardType.HIDDEN:
-        return [card for card in card_list if card.get_type() is return_card_type]
+        return [card for card in card_list if card.get_type() is return_card_type][:count]
 
     return []
 
@@ -395,7 +399,7 @@ def _get_straight_flush_list(card_list: list[Card]):
     # If straight is not found, exception will be thrown from get_straight_list() function.
     try:
         return _get_straight_list(card_list)
-    except AttributeError as e:
+    except (AttributeError, IndexError) as e:
         raise AttributeError("get_straight_flush_list: HandType does not match attempted best_hand assignment.") from e
 
 
@@ -450,13 +454,13 @@ class Hand:
 
         # Dictionary matches hand types with corresponding function call (excluding royal/straight flush or high card).
         # If the function call returns a value that is not equal to CardType.HIDDEN, then that hand type is present.
-        hand_dict = {HandType.QUADS:        _find_multiples(self.card_list, CARDS_IN_QUADS),
-                     HandType.FULL_HOUSE:   _find_full_house(self.card_list),
-                     HandType.FLUSH:        _find_flush(self.card_list),
-                     HandType.STRAIGHT:     _find_straight(self.card_list),
-                     HandType.TRIPS:        _find_multiples(self.card_list, CARDS_IN_TRIPS),
-                     HandType.TWO_PAIR:     _find_two_pair(self.card_list),
-                     HandType.PAIR:         _find_multiples(self.card_list, CARDS_IN_PAIR)}
+        hand_dict = {HandType.QUADS:      partial(_find_multiples, self.card_list, CARDS_IN_QUADS),
+                     HandType.FULL_HOUSE: partial(_find_full_house, self.card_list),
+                     HandType.FLUSH:      partial(_find_flush, self.card_list),
+                     HandType.STRAIGHT:   partial(_find_straight, self.card_list),
+                     HandType.TRIPS:      partial(_find_multiples, self.card_list, CARDS_IN_TRIPS),
+                     HandType.TWO_PAIR:   partial(_find_two_pair, self.card_list),
+                     HandType.PAIR:       partial(_find_multiples, self.card_list, CARDS_IN_PAIR)}
 
         # Assume HandType.HIGH_CARD, which will be overwrote if a stronger hand is found.
         self.hand_type = HandType.HIGH_CARD
@@ -473,38 +477,16 @@ class Hand:
         # If there is no royal/straight flush, iterate through the dictionary to check the rest of the hand types.
         else:
             for hand in hand_dict:
-                if hand_dict[hand] is not CardType.HIDDEN:
+                if hand_dict[hand]() is not CardType.HIDDEN:
                     self.hand_type = hand
                     break
 
-        # TODO: Should update_hand_list() be a private function?
-        self.update_hand_list()
-
-    def update_hand_list(self):
-        """
-        Update best_hand to create a list of up to 5 cards that create the best hand.
-
-        :return: None.
-        """
-
-        # Depending on the hand that was detected, call the corresponding get list function.
-        hand_type_dict = {HandType.ROYAL_FLUSH:    _get_straight_flush_list(self.card_list),
-                          HandType.STRAIGHT_FLUSH: _get_straight_flush_list(self.card_list),
-                          HandType.QUADS:          _get_set_list(self.card_list, CARDS_IN_QUADS),
-                          HandType.FULL_HOUSE:     _get_full_house_list(self.card_list),
-                          HandType.FLUSH:          _get_flush_list(self.card_list),
-                          HandType.STRAIGHT:       _get_straight_list(self.card_list),
-                          HandType.TRIPS:          _get_set_list(self.card_list, CARDS_IN_TRIPS),
-                          HandType.TWO_PAIR:       _get_pair_list(self.card_list, 2),
-                          HandType.PAIR:           _get_pair_list(self.card_list, 1),
-                          HandType.HIGH_CARD:      _get_high_card_list(self.card_list, MAX_CARDS_IN_HAND),
-                          HandType.HIDDEN:         []}
-
-        self.best_hand = hand_type_dict[self.hand_type]
+        self._update_hand_list()
 
     def append_card_list(self, card_list: list[Card]):
         """
-        Add a specified list of cards to the list of cards.
+        Add a specified list of cards to the list of cards. If the list contains any element that is not a Card object,
+        no elements are added.
 
         :param card_list: List of card objects to be added.
         :return: None.
@@ -516,7 +498,7 @@ class Hand:
 
     def add_card(self, card: Card):
         """
-        Add a specified card ot the list of cards.
+        Add a specified card ot the list of cards. If the provided card is not a Card object, it is not added.
 
         :param card: Card object to be added
         :return: None.
@@ -553,3 +535,25 @@ class Hand:
         :return: None.
         """
         self.card_list.sort(key=lambda x: x.get_type().value, reverse=True)
+
+    def _update_hand_list(self):
+        """
+        Update best_hand to create a list of up to 5 cards that create the best hand.
+
+        :return: None.
+        """
+
+        # Depending on the hand that was detected, call the corresponding get list function.
+        hand_type_dict = {HandType.ROYAL_FLUSH:    partial(_get_straight_flush_list, self.card_list),
+                          HandType.STRAIGHT_FLUSH: partial(_get_straight_flush_list, self.card_list),
+                          HandType.QUADS:          partial(_get_set_list, self.card_list, CARDS_IN_QUADS),
+                          HandType.FULL_HOUSE:     partial(_get_full_house_list, self.card_list),
+                          HandType.FLUSH:          partial(_get_flush_list, self.card_list),
+                          HandType.STRAIGHT:       partial(_get_straight_list, self.card_list),
+                          HandType.TRIPS:          partial(_get_set_list, self.card_list, CARDS_IN_TRIPS),
+                          HandType.TWO_PAIR:       partial(_get_pair_list, self.card_list, PAIRS_IN_TWO_PAIR),
+                          HandType.PAIR:           partial(_get_pair_list, self.card_list, PAIRS_IN_ONE_PAIR),
+                          HandType.HIGH_CARD:      partial(_get_high_card_list, self.card_list, MAX_CARDS_IN_HAND),
+                          HandType.NOT_EVALUATED:  partial(_get_high_card_list, self.card_list, MAX_CARDS_IN_HAND)}
+
+        self.best_hand = hand_type_dict[self.hand_type]()
