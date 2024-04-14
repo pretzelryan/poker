@@ -6,23 +6,48 @@
 # Author - Ryan Muetzel (@pretzelryan)
 #
 
+# Standard imports.
+import unittest
+
+
+# Package imports.
 from poker import card
 
 
-def main():
-    new_card = card.Card(1, 2)
-    print("\nDisplay card. Expected: Hidden Card      Actual:", new_card)
-    print("Get card type. Expected: CardType.HIDDEN     Actual:", new_card.get_type())
-    print("Get card suit. Expected: Suit.HIDDEN     Actual:", new_card.get_suit())
+class TestHand(unittest.TestCase):
+    def test_repr(self):
+        new_card = card.Card(1, 2)
+        self.assertEqual(str(new_card), "Hidden Card",
+                         "TEST1: __repr__ did not return Hidden Card before reveal.")
 
-    new_card.reveal_card()
-    print("\nDisplay card. Expected: Two of Hearts    Actual:", new_card)
-    print("Get card type. Expected: CardType.TWO     Actual:", new_card.get_type())
-    print("Get card suit. Expected: Suit.HEARTS     Actual:", new_card.get_suit())
+    def test_get_suit(self):
+        new_card = card.Card(1, 2)
+        self.assertEqual(new_card.get_suit(), card.Suit.HIDDEN,
+                         "TEST2: get_suit did not return HIDDEN before reveal.")
 
-    new_type = card.CardType(16)
-    print("\nCard Type. Expected: Type.HIDDEN     Actual:", new_type)
+    def test_get_type(self):
+        new_card = card.Card(1, 2)
+        self.assertEqual(new_card.get_type(), card.CardType.HIDDEN,
+                         "TEST2: get_suit did not return HIDDEN before reveal.")
+
+    def test_repr_reveal(self):
+        new_card = card.Card(1, 2)
+        new_card.reveal_card()
+        self.assertEqual(str(new_card), "Two of Spades",
+                         "TEST4: __repr__ did not return correct card name after reveal.")
+
+    def test_get_suit_reveal(self):
+        new_card = card.Card(1, 2)
+        new_card.reveal_card()
+        self.assertEqual(new_card.get_suit(), card.Suit.SPADES,
+                         "TEST5: get_suit did not return correct suit after reveal.")
+
+    def test_get_type_reveal(self):
+        new_card = card.Card(1, 2)
+        new_card.reveal_card()
+        self.assertEqual(new_card.get_type(), card.CardType.TWO,
+                         "TEST6: get_suit did not return correct suit after reveal.")
 
 
 if __name__ == "__main__":
-    main()
+    unittest.main()
