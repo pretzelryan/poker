@@ -79,7 +79,7 @@ class Card:
         :param other: Card object to be compared.
         :return: Boolean True if the cards are equal, False otherwise.
         """
-        return (not self.hidden) and (self.get_suit() == other.get_suit()) and (self.get_suit() == other.get_suit())
+        return (not self.hidden) and (self.get_suit() == other.get_suit()) and (self.get_type() == other.get_type())
 
     def is_hidden(self):
         """
